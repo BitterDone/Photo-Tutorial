@@ -13,6 +13,7 @@
 /[Aa]ssets/MixedRealityToolkit.Generated
 /[Aa]ssets/TextMesh\ Pro
 /*[Tt]est*/
+/Assets/Photon/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
