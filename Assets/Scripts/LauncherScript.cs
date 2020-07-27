@@ -4,7 +4,8 @@ using Photon.Pun;
 
 namespace Com.MyCompany.MyGame
 {
-    public class LauncherScript : MonoBehaviour
+    // public class LauncherScript : MonoBehaviour
+    public class LauncherScript : MonoBehaviourPunCallbacks
     {
 #region Private Serializable Fields
 #endregion
