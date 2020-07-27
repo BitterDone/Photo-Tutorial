@@ -31,7 +31,7 @@ namespace Com.MyCompany.MyGame
         // MonoBehaviour method called on GameObject by Unity during initialization phase.
         void Start() {
             Debug.Log("Start() called in LauncherScript");
-            Connect();
+            // Connect();
         }
 #endregion
 #region Public Methods
