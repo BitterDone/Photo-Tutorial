@@ -4,15 +4,15 @@ using System.Collections;
 
 namespace Com.MyCompany.MyGame {
     public class PlayerAnimatorManager : MonoBehaviour {
-#region MonoBehaviour Callbacks
 
 #region Private Fields
     [SerializeField]
     private float directionDampTime = 0.25f;
+    private Animator animator;
 #endregion
 
-private Animator animator;
-// Use this for initialization
+#region MonoBehaviour Callbacks
+    // Use this for initialization
         void Start() {
             animator = GetComponent<Animator>();
             if (!animator) {
@@ -26,6 +26,17 @@ private Animator animator;
              if (!animator) {
                 return;
             }
+
+            // deal with Jumping
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            // only allow jumping if we are running.
+            if (stateInfo.IsName("Base Layer.Run")) {
+                // When using trigger parameter
+                if (Input.GetButtonDown("Fire2")) {
+                    animator.SetTrigger("Jump");
+                }
+            }
+
             float h = Input.GetAxis("Horizontal");
             float v = Input.GetAxis("Vertical");
             if (v < 0) {

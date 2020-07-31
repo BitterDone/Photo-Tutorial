@@ -361,6 +361,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1440577046963862613, guid: 808573f8d65b9ba488b0156ebf78898d,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3782851343708705004, guid: 808573f8d65b9ba488b0156ebf78898d,
+        type: 3}
+      propertyPath: viewIdField
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3884146075855436630, guid: 808573f8d65b9ba488b0156ebf78898d,
         type: 3}
       propertyPath: m_Controller
