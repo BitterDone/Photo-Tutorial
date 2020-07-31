@@ -7,6 +7,8 @@ using Photon.Realtime;
 
 namespace Com.MyCompany.MyGame {
     public class GameManager : MonoBehaviourPunCallbacks {
+        public static GameManager Instance;
+
 #region Photon Callbacks
         /// Called when the local player left the room. We need to load the launcher scene.
         public override void OnLeftRoom() {
@@ -50,6 +52,10 @@ namespace Com.MyCompany.MyGame {
                 Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
                 PhotonNetwork.LoadLevel("Room for " + PhotonNetwork.CurrentRoom.PlayerCount);
             }
+        }
+
+        void Start() {
+            Instance = this;
         }
 #endregion
 

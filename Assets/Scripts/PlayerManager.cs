@@ -7,8 +7,13 @@ using System.Collections;
 
 namespace Com.MyCompany.MyGame {
     public class PlayerManager : MonoBehaviourPunCallbacks {
-#region Private Fields
 
+#region Private Fields
+        [Tooltip("The current Health of our player")]
+        public float Health = 1f;
+#endregion
+
+#region Private Fields
         [Tooltip("The Beams GameObject to control")]
         [SerializeField]
         private GameObject beams;
@@ -17,7 +22,6 @@ namespace Com.MyCompany.MyGame {
 #endregion
 
 #region MonoBehaviour CallBacks
-
         void Awake() {
             if (beams == null) {
                 Debug.LogError("<Color=Red><a>Missing</a></Color> Beams Reference.", this);
@@ -35,12 +39,39 @@ namespace Com.MyCompany.MyGame {
             if (beams != null && IsFiring != beams.activeInHierarchy) {
                 beams.SetActive(IsFiring);
             }
+
+            if (Health <= 0f) {
+                GameManager.Instance.LeaveRoom();
+            }
         }
 
+        void OnTriggerEnter(Collider other) {
+            if (!photonView.IsMine) {
+                return;
+            }
+            // We are only interested in Beamers
+            // we should be using tags but for the sake of distribution, let's simply check by name.
+            if (!other.name.Contains("Beam")) {
+                return;
+            }
+            Health -= 0.1f;
+        }
+        void OnTriggerStay(Collider other) {
+            // we dont' do anything if we are not the local player.
+            if (! photonView.IsMine) {
+                return;
+            }
+            // We are only interested in Beamers
+            // we should be using tags but for the sake of distribution, let's simply check by name.
+            if (!other.name.Contains("Beam")) {
+                return;
+            }
+            // we slowly affect health when beam is constantly hitting us, so player has to move to prevent death.
+            Health -= 0.1f*Time.deltaTime;
+        }
 #endregion
 
 #region Custom
-
         void ProcessInputs() {
             if (Input.GetButtonDown("Fire1")) {
                 if (!IsFiring) {
