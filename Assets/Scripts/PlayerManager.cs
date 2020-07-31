@@ -2,11 +2,12 @@
 using UnityEngine.EventSystems;
 
 using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
 
 using System.Collections;
 
 namespace Com.MyCompany.MyGame {
-    public class PlayerManager : MonoBehaviourPunCallbacks {
+    public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable {
 
 #region Private Fields
         [Tooltip("The current Health of our player")]
@@ -30,10 +31,24 @@ namespace Com.MyCompany.MyGame {
                 beams.SetActive(false);
             }
         }
+        
+        void Start() {
+            CameraWork _cameraWork = this.gameObject.GetComponent<CameraWork>();
+
+            if (_cameraWork != null) {
+                if (photonView.IsMine) {
+                    _cameraWork.OnStartFollowing();
+                }
+            }
+            else {
+                Debug.LogError("<Color=Red><a>Missing</a></Color> CameraWork Component on playerPrefab.", this);
+            }
+        }
 
         void Update() {
-
-            ProcessInputs();
+            if (photonView.IsMine) {
+                ProcessInputs ();
+            }
 
             // trigger Beams active state
             if (beams != null && IsFiring != beams.activeInHierarchy) {
@@ -84,6 +99,22 @@ namespace Com.MyCompany.MyGame {
                 }
             }
         }
+
+#endregion
+
+#region IPunObservable implementation
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
+        if (stream.IsWriting) {
+            // We own this player: send the others our data
+            stream.SendNext(IsFiring);
+            stream.SendNext(Health);
+        }
+        else {
+            // Network player, receive data
+            this.IsFiring = (bool)stream.ReceiveNext();
+            this.Health = (float)stream.ReceiveNext();
+        }
+    }
 
 #endregion
     }
