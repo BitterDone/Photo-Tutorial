@@ -15,7 +15,7 @@ namespace Com.MyCompany.MyGame
         [Tooltip("The UI Label to inform the user that the connection is in progress")]
         [SerializeField]
         private GameObject progressLabel;
-
+        bool isConnecting;
 #endregion
 
 
@@ -53,14 +53,15 @@ namespace Com.MyCompany.MyGame
             controlPanel.SetActive(false);
             // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
             if (PhotonNetwork.IsConnected) {
-                Debug.Log("Connect() called in LauncherScript");
+                Debug.Log("PhotonNetwork.IsConnected true");
                 // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
                 PhotonNetwork.JoinRandomRoom();
             }
             else {
-                Debug.Log("Connect() called in LauncherScript");
+                Debug.Log("PhotonNetwork.IsConnected false");
+                isConnecting = PhotonNetwork.ConnectUsingSettings();
                 // #Critical, we must first and foremost connect to Photon Online Server.
-                PhotonNetwork.ConnectUsingSettings();
+                // PhotonNetwork.ConnectUsingSettings(); // moved to isConnecting boolean
                 PhotonNetwork.GameVersion = gameVersion;
             }
         }
@@ -69,8 +70,11 @@ namespace Com.MyCompany.MyGame
 
         public override void OnConnectedToMaster() {
             Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
-            // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
-            PhotonNetwork.JoinRandomRoom();
+            if (isConnecting) {
+                // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
+                PhotonNetwork.JoinRandomRoom();
+                isConnecting = false;
+            }
         }
 
 
@@ -78,6 +82,7 @@ namespace Com.MyCompany.MyGame
             Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
             progressLabel.SetActive(false);
             controlPanel.SetActive(true);
+            isConnecting = false;
         }
 
         public override void OnJoinRandomFailed(short returnCode, string message) {
@@ -90,6 +95,12 @@ namespace Com.MyCompany.MyGame
 
         public override void OnJoinedRoom() {
             Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+            // #Critical: We only load if we are the first player, else we rely on `PhotonNetwork.AutomaticallySyncScene` to sync our instance scene.
+            if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
+                Debug.Log("We load the 'Room for 1' ");
+                // #Critical - Load the Room Level.
+                PhotonNetwork.LoadLevel("Room for 1");
+            }
         }
 #endregion
 
