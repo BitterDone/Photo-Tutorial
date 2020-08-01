@@ -14,6 +14,10 @@ namespace Com.MyCompany.MyGame {
         public float Health = 1f;
         [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
         public static GameObject LocalPlayerInstance;
+
+        [Tooltip("The Player's UI GameObject Prefab")]
+        [SerializeField]
+        public GameObject PlayerUiPrefab;
 #endregion
 
 #region Private Fields
@@ -50,8 +54,7 @@ namespace Com.MyCompany.MyGame {
                 if (photonView.IsMine) {
                     _cameraWork.OnStartFollowing();
                 }
-            }
-            else {
+            } else {
                 Debug.LogError("<Color=Red><a>Missing</a></Color> CameraWork Component on playerPrefab.", this);
             }
 
@@ -59,6 +62,13 @@ namespace Com.MyCompany.MyGame {
             // Unity 5.4 has a new scene management. register a method to call CalledOnLevelWasLoaded.
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
             #endif
+
+            if (PlayerUiPrefab != null) {
+                GameObject _uiGo =  Instantiate(PlayerUiPrefab);
+                _uiGo.SendMessage ("SetTarget", this, SendMessageOptions.RequireReceiver);
+            } else {
+                Debug.LogWarning("<Color=Red><a>Missing</a></Color> PlayerUiPrefab reference on player Prefab.", this);
+            }
         }
 
         void Update() {
@@ -113,6 +123,9 @@ namespace Com.MyCompany.MyGame {
             if (!Physics.Raycast(transform.position, -Vector3.up, 5f)) {
                 transform.position = new Vector3(0f, 5f, 0f);
             }
+
+            GameObject _uiGo = Instantiate(this.PlayerUiPrefab);
+            _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
         }
 #endregion
 
