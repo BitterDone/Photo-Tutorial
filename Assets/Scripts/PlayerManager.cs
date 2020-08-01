@@ -9,9 +9,11 @@ using System.Collections;
 namespace Com.MyCompany.MyGame {
     public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable {
 
-#region Private Fields
+#region Public Fields
         [Tooltip("The current Health of our player")]
         public float Health = 1f;
+        [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
+        public static GameObject LocalPlayerInstance;
 #endregion
 
 #region Private Fields
@@ -30,6 +32,15 @@ namespace Com.MyCompany.MyGame {
             else {
                 beams.SetActive(false);
             }
+
+            // #Important
+            // used in GameManager.cs: we keep track of the localPlayer instance to prevent instantiation when levels are synchronized
+            if (photonView.IsMine) {
+                PlayerManager.LocalPlayerInstance = this.gameObject;
+            }
+            // #Critical
+            // we flag as don't destroy on load so that instance survives level synchronization, thus giving a seamless experience when levels load.
+            DontDestroyOnLoad(this.gameObject);
         }
         
         void Start() {
